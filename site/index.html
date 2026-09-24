@@ -5,25 +5,27 @@
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Numerology calculator</title>
 <style>
-  body { margin: 0; padding: 32px 16px; background: #fff; color: #333; font: 16px/1.6 Tahoma, Geneva, sans-serif; }
-  main { max-width: 64em; }
-  h1, h3 { color: #1f5f8b; font-weight: normal; }
-  h1 { font-size: 1.8em; margin: 0 0 24px; }
-  h3 { font-size: 1.25em; margin: 0 0 8px; }
-  label { display: block; margin-bottom: 6px; }
-  input { font: inherit; color: #1f5f8b; padding: 6px 8px; width: 100%; max-width: 24em; box-sizing: border-box; border: 1px solid #999; border-radius: 3px; }
-  .systems { display: grid; gap: 32px 48px; margin-top: 32px; }
-  @media (min-width: 760px) { .systems { grid-template-columns: 1fr 1fr; } }
-  .final { font-weight: bold; font-size: 1.4em; margin: 0; }
-  .final small { font-weight: normal; font-size: .6em; color: #777; margin-left: 6px; }
-  .working { font-family: Consolas, monospace; margin: 4px 0 0; overflow-wrap: anywhere; }
-  .working sub { font-size: .7em; color: #777; }
-  table { border-collapse: collapse; margin: 16px 0 8px; }
-  th, td { border: 1px solid #ccc; padding: 4px 10px; text-align: center; min-width: 1.2em; }
-  th { background: #f4f4f4; }
-  td { transition: background-color .25s, color .25s; }
+  body { margin: 0; padding: 40px 16px; background: #fff; color: #1c1c1c; font: 16px/1.6 system-ui, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; }
+  main { max-width: 64em; margin: 0 auto; }
+  h1 { font-size: 2.4em; line-height: 1.1; margin: 0 0 28px; color: #1f5f8b; letter-spacing: -.01em; }
+  label { display: block; font-weight: 600; margin-bottom: 8px; }
+  input { font: inherit; font-size: 1.5em; color: #1f5f8b; padding: 10px 14px; width: 100%; max-width: 20em; box-sizing: border-box; border: 2px solid #1c1c1c; border-radius: 4px; outline: none; }
+  input:focus { border-color: #1f5f8b; }
+  .systems { display: grid; gap: 40px 56px; margin-top: 40px; }
+  @media (min-width: 760px) { .systems { grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); } }
+  .system { border-top: 5px solid #1f5f8b; padding-top: 14px; min-width: 0; }
+  h2 { font-size: .95em; text-transform: uppercase; letter-spacing: .12em; color: #1f5f8b; margin: 0 0 6px; }
+  .final { font-size: 3em; font-weight: 700; line-height: 1.1; margin: 0; font-variant-numeric: tabular-nums; }
+  .final span { color: #1f5f8b; font-weight: 400; }
+  .final.empty { color: #d0d0d0; }
+  .working { font-family: Consolas, "Courier New", monospace; line-height: 24px; height: 48px; box-sizing: border-box; background: #f3f5f7; padding: 8px 12px 16px; margin: 12px 0 0; border-radius: 4px; white-space: nowrap; overflow-x: auto; overflow-y: hidden; }
+  .working sub { font-size: .7em; line-height: 0; vertical-align: baseline; position: relative; top: .35em; color: #1f5f8b; }
+  table { border-collapse: collapse; width: 100%; table-layout: fixed; margin: 20px 0 12px; font-weight: 600; }
+  th, td { border: 1px solid #cfd6dc; text-align: center; height: 2.3em; }
+  th { background: #1c1c1c; border-color: #1c1c1c; color: #fff; }
+  td { color: #555; transition: background-color .25s, color .25s; }
   td.used { background: #1f5f8b; color: #fff; }
-  .system p.note { margin: 0; }
+  .note { margin: 0; color: #555; font-size: .95em; }
 </style>
 </head>
 <body>
@@ -34,25 +36,21 @@
   <input id="name" type="text" autocomplete="off" spellcheck="false">
 
   <div class="systems">
-    <div class="system">
-      <h3>Pythagorean</h3>
-      <div class="result" id="pythagorean-result" hidden>
-        <p class="final" id="pythagorean-final"></p>
-        <p class="working" id="pythagorean-working"></p>
-      </div>
+    <section class="system">
+      <h2>Pythagorean</h2>
+      <p class="final empty" id="pythagorean-final">0</p>
+      <p class="working" id="pythagorean-working"></p>
       <table id="pythagorean-chart"></table>
       <p class="note">Each letter takes the number of its column, from 1 to 9. The total is reduced by adding its digits until one digit is left. The master numbers 11, 22 and 33 are not reduced.</p>
-    </div>
+    </section>
 
-    <div class="system">
-      <h3>Chaldean</h3>
-      <div class="result" id="chaldean-result" hidden>
-        <p class="final" id="chaldean-final"></p>
-        <p class="working" id="chaldean-working"></p>
-      </div>
+    <section class="system">
+      <h2>Chaldean</h2>
+      <p class="final empty" id="chaldean-final">0</p>
+      <p class="working" id="chaldean-working"></p>
       <table id="chaldean-chart"></table>
       <p class="note">Letters are grouped by sound and take values from 1 to 8. No letter has the value 9. The total before reducing is called the compound number.</p>
-    </div>
+    </section>
   </div>
 </main>
 <script src="core/numerology.js"></script>
@@ -82,14 +80,17 @@
       const used = new Set(r.terms.map(t => t.char));
       for (const [letter, td] of Object.entries(cells[id])) td.classList.toggle("used", used.has(letter));
 
-      document.getElementById(`${id}-result`).hidden = !r.terms.length;
-      if (!r.terms.length) continue;
+      const final = document.getElementById(`${id}-final`);
+      const working = document.getElementById(`${id}-working`);
+      final.classList.toggle("empty", !r.terms.length);
+      if (!r.terms.length) { final.textContent = "0"; working.innerHTML = ""; continue; }
+
       let line = r.terms.map(t => t.kind === "letter" ? `${t.char}<sub>${t.value}</sub>` : t.char).join(" + ");
       line += ` = ${r.raw}`;
       for (const s of r.steps) line += ` → ${s.digits.join("+")} = ${s.total}`;
-      document.getElementById(`${id}-working`).innerHTML = line;
-      const label = id === "chaldean" ? "reduced / compound" : "reduced / raw";
-      document.getElementById(`${id}-final`).innerHTML = `${r.reduced} / ${r.raw}<small>${label}</small>`;
+      working.innerHTML = line;
+      working.scrollLeft = working.scrollWidth;
+      final.innerHTML = `${r.raw} <span>/ ${r.reduced}</span>`;
     }
   });
 </script>
