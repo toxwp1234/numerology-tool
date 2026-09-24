@@ -1,6 +1,6 @@
 name: Deploy website
 
-# Publishes site/ plus the files from the latest GitHub Release to GitHub Pages
+# Publishes site/ with the shared core/ code to GitHub Pages
 on:
   push:
     branches: [main]
@@ -27,18 +27,6 @@ jobs:
 
       - name: Add shared calculation code
         run: cp -r core site/core
-
-      - name: Add latest release files
-        env:
-          GH_TOKEN: ${{ github.token }}
-        run: |
-          if TAG=$(gh release view --repo "$GITHUB_REPOSITORY" --json tagName -q .tagName 2>/dev/null); then
-            gh release download "$TAG" --repo "$GITHUB_REPOSITORY" --dir site --pattern 'numerology-tool*'
-            sed -i "s/__VERSION__/${TAG}/g" site/index.html
-          else
-            echo "No release yet — deploying page without download files"
-            sed -i "s/__VERSION__/coming soon/g" site/index.html
-          fi
 
       - uses: actions/configure-pages@v5
 

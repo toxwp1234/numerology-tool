@@ -5,27 +5,28 @@ text you select. Highlight a word, name or date on any web page, right-click, an
 value appears in the context menu as **reduced / raw**, for example `7 / 25` for
 "Hello".
 
-**Website and download:** https://toxwp1234.github.io/numerology-tool/, which
-also has a calculator showing the Pythagorean and Chaldean values of any name.
+**Download:** [Releases](https://github.com/toxwp1234/numerology-tool/releases/latest)
+
+**Calculator:** https://toxwp1234.github.io/numerology-tool/ shows the Pythagorean
+and Chaldean values of any name.
 
 ## Install
 
 ### Firefox (140 or newer)
 
-1. Open the [download page](https://toxwp1234.github.io/numerology-tool/) and click **Add to Firefox**.
-2. If Firefox says it blocked the request, click **Continue to installation**.
+1. Download `numerology-tool.xpi` from the
+   [latest release](https://github.com/toxwp1234/numerology-tool/releases/latest).
+2. Drag the file into a Firefox window, or open `about:addons`, click the gear icon
+   and choose **Install Add-on From File**.
 3. Click **Add**.
 
 The add-on is signed by Mozilla, so it stays installed after restarting Firefox.
-You can also download `numerology-tool.xpi` from
-[Releases](https://github.com/toxwp1234/numerology-tool/releases) and drag it into a
-Firefox window.
 
 ### Chrome, Edge, Brave
 
 1. Download `numerology-tool-chrome.zip` from the
-   [download page](https://toxwp1234.github.io/numerology-tool/) and unzip it to a
-   folder you'll keep.
+   [latest release](https://github.com/toxwp1234/numerology-tool/releases/latest)
+   and unzip it to a folder you'll keep.
 2. Open `chrome://extensions` and turn on **Developer mode**.
 3. Click **Load unpacked** and choose the unzipped folder.
 
@@ -59,11 +60,11 @@ sends nothing anywhere.
 chrome/     Chrome / Edge version (Manifest V3, service worker)
 firefox/    Firefox version (Manifest V3, background script)
 core/       numerology systems (Pythagorean, Chaldean), used by the website
-site/       calculator and download page, published to GitHub Pages
+site/       calculator page, published to GitHub Pages
 scripts/    release helper
 .github/workflows/
   release.yml   signs the Firefox build with Mozilla and creates a GitHub Release
-  pages.yml     publishes the download page
+  pages.yml     publishes the calculator page
 ```
 
 The calculation lives in `content.js` and is the same in both versions, so change
@@ -85,7 +86,7 @@ both files together.
    ```
 
 The Release workflow sends the Firefox build to Mozilla for signing, packages the
-Chrome build, attaches both to a GitHub Release and updates the download page.
+Chrome build and attaches both to a GitHub Release.
 Mozilla signs each version number only once. It needs the repository secrets
 `AMO_JWT_ISSUER` and `AMO_JWT_SECRET` (API keys from
 https://addons.mozilla.org/developers/addon/api/key/).

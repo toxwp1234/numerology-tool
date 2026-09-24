@@ -8,8 +8,7 @@ on:
     tags: ["v*"]
 
 permissions:
-  contents: write   # create the GitHub Release
-  actions: write    # trigger the website workflow
+  contents: write
 
 jobs:
   release:
@@ -69,9 +68,3 @@ jobs:
             dist/numerology-tool.xpi
             dist/numerology-tool-chrome.zip
 
-      # A tag can't deploy to github-pages (environment protection), so run
-      # the website workflow on main instead.
-      - name: Update website
-        env:
-          GH_TOKEN: ${{ github.token }}
-        run: gh workflow run pages.yml --ref main
