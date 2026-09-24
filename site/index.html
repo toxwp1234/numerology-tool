@@ -36,6 +36,9 @@
   .values td { font-size: .9em; }
   .note { margin: 0; color: #666; font-size: .9em; }
   .note a { color: #1f5f8b; }
+  .steps { margin: 10px 0 0; padding: 10px 14px 10px 34px; background: #f5f9fc; border-radius: 4px; font-size: .95em; }
+  .steps li + li { margin-top: 4px; }
+  .steps code { font-size: .9em; }
   .lede { margin: 0 0 20px; color: #444; }
   .ext-body { display: grid; gap: 24px 48px; align-items: start; }
   @media (min-width: 760px) { .ext-body { grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); } }
@@ -43,7 +46,7 @@
   .download { display: flex; justify-content: space-between; align-items: center; gap: 12px; padding: 10px 14px; margin-bottom: 6px; border: 1px solid #c9d6e0; border-radius: 4px; color: #222; text-decoration: none; }
   .download:hover { border-color: #1f5f8b; background: #f5f9fc; }
   .download span { color: #1f5f8b; font-size: .9em; white-space: nowrap; }
-  .download span::after { content: " 93"; }
+  .download span::after { content: " ↓"; }
   .demo { border: 1px solid #ddd; border-radius: 4px; overflow: hidden; background: #fff; }
   .demo .bar { display: flex; gap: 5px; padding: 8px 10px; background: #f5f5f5; border-bottom: 1px solid #e5e5e5; }
   .demo .bar i { width: 8px; height: 8px; border-radius: 50%; background: #ccc; }
@@ -111,11 +114,22 @@
       <div class="versions">
         <div>
           <a class="download" href="https://github.com/toxwp1234/numerology-tool/releases/latest/download/numerology-tool.xpi"><strong>Firefox</strong><span>Download .xpi</span></a>
-          <p class="note">Drag the file into a Firefox window and click Add. Signed by Mozilla, needs Firefox 140 or newer.</p>
+          <p class="note">Signed by Mozilla. Needs Firefox 140 or newer.</p>
+          <ol class="steps" hidden>
+            <li>Drag the downloaded <code>numerology-tool.xpi</code> into a Firefox window.</li>
+            <li>Click <strong>Add</strong> when Firefox asks.</li>
+            <li>Select text on any page and right-click it.</li>
+          </ol>
         </div>
         <div>
           <a class="download" href="https://github.com/toxwp1234/numerology-tool/releases/latest/download/numerology-tool-chrome.zip"><strong>Chrome, Edge, Brave</strong><span>Download .zip</span></a>
-          <p class="note">Unzip it, open chrome://extensions, turn on Developer mode and choose Load unpacked.</p>
+          <p class="note">Installs in Developer mode.</p>
+          <ol class="steps" hidden>
+            <li>Unzip <code>numerology-tool-chrome.zip</code> to a folder you'll keep.</li>
+            <li>Open <code>chrome://extensions</code> and turn on <strong>Developer mode</strong>.</li>
+            <li>Click <strong>Load unpacked</strong> and choose the unzipped folder.</li>
+            <li>Select text on any page and right-click it.</li>
+          </ol>
         </div>
         <p class="note"><a href="https://github.com/toxwp1234/numerology-tool#install">Full installation steps</a></p>
       </div>
@@ -202,6 +216,10 @@
 
   const demo = calculate("pythagorean", document.getElementById("demo-word").textContent);
   document.getElementById("demo-value").textContent = `${demo.reduced} / ${demo.raw}`;
+
+  document.querySelectorAll(".download").forEach(link => link.addEventListener("click", () => {
+    link.parentElement.querySelector(".steps").hidden = false;
+  }));
 
   const shared = new URLSearchParams(location.search).get("t");
   if (shared) { input.value = shared; render(); }
