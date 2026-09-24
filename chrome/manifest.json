@@ -1,0 +1,21 @@
+{
+  "manifest_version": 3,
+  "name": "Numerology Tool",
+  "version": "1.0",
+  "description": "Pokazuje wartość numerologiczną zaznaczonego tekstu w menu kontekstowym. Format: zredukowana / surowa.",
+  "permissions": [
+    "contextMenus"
+  ],
+  "host_permissions": [
+    "<all_urls>"
+  ],
+  "background": {
+    "service_worker": "background.js"
+  },
+  "content_scripts": [
+    {
+      "matches": ["<all_urls>"],
+      "js": ["content.js"]
+    }
+  ]
+}

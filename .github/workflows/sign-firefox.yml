@@ -1,0 +1,46 @@
+name: Sign Firefox extension
+
+# Uruchom ręcznie (Actions → Sign Firefox extension → Run workflow)
+# albo wypchnij tag, np. `git tag v1.0 && git push origin v1.0`
+on:
+  workflow_dispatch:
+  push:
+    tags: ["v*"]
+
+permissions:
+  contents: write
+
+jobs:
+  sign:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+
+      - name: Lint
+        run: npx --yes web-ext lint --source-dir firefox
+
+      - name: Sign with Mozilla (unlisted / self-distribution)
+        env:
+          WEB_EXT_API_KEY: ${{ secrets.AMO_JWT_ISSUER }}
+          WEB_EXT_API_SECRET: ${{ secrets.AMO_JWT_SECRET }}
+        run: |
+          npx --yes web-ext sign \
+            --source-dir firefox \
+            --artifacts-dir dist \
+            --channel unlisted \
+            --approval-timeout 900000
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: numerology-tool-firefox
+          path: dist/*.xpi
+
+      - name: Attach to GitHub release
+        if: startsWith(github.ref, 'refs/tags/')
+        uses: softprops/action-gh-release@v2
+        with:
+          files: dist/*.xpi
