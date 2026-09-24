@@ -11,7 +11,9 @@ Liczby mistrzowskie 11, 22 i 33 nie są redukowane.
 ```
 chrome/     Manifest V3 dla Chrome / Edge (service worker)
 firefox/    Manifest V3 dla Firefoksa (event page, API browser.*, gecko id)
-.github/workflows/sign-firefox.yml   podpisywanie .xpi przez Mozillę
+site/       strona do pobrania: https://toxwp1234.github.io/numerology-tool/
+.github/workflows/release.yml   podpisanie .xpi przez Mozillę + GitHub Release
+.github/workflows/pages.yml     publikacja strony na GitHub Pages
 ```
 
 Logika obliczeń jest w `content.js` i jest taka sama w obu wersjach — zmieniając
@@ -42,16 +44,18 @@ który możesz wysłać komu chcesz.
    - `AMO_JWT_ISSUER`
    - `AMO_JWT_SECRET`
 
-### Podpisywanie
+### Wydanie nowej wersji
 
-- **Actions → Sign Firefox extension → Run workflow** — podpisany `.xpi` pojawi się
-  jako artefakt uruchomienia, albo
-- wypchnij tag (`git tag v1.0 && git push origin v1.0`) — `.xpi` zostanie dołączony
-  do GitHub Release.
+1. Podnieś `"version"` w `firefox/manifest.json` **i** `chrome/manifest.json` (muszą być równe).
+2. Commit, potem tag z tym samym numerem:
+   ```bash
+   git tag v1.1
+   git push origin main v1.1
+   ```
 
-Każde podpisanie wymaga **nowego numeru `version`** w `firefox/manifest.json`
-(Mozilla nie podpisze dwa razy tej samej wersji). Pole `gecko.id` ustala się przy
-pierwszym podpisaniu i nie należy go potem zmieniać.
+Workflow **Release** podpisze `.xpi` u Mozilli, spakuje wersję dla Chrome, doda oba pliki
+do GitHub Release i zaktualizuje stronę. Mozilla nie podpisze dwa razy tej samej wersji.
+Pole `gecko.id` ustala się przy pierwszym podpisaniu i nie należy go potem zmieniać.
 
 ### Lokalnie zamiast GitHuba (wymaga Node.js)
 
@@ -61,5 +65,6 @@ npx web-ext sign --source-dir firefox --channel unlisted --api-key <JWT issuer> 
 
 ### Instalacja u znajomych
 
-Przeciągnij plik `.xpi` do okna Firefoksa (lub otwórz go przez
-`about:addons` → ⚙ → **Zainstaluj dodatek z pliku**). Wymagany Firefox 140+.
+Wyślij link do strony: https://toxwp1234.github.io/numerology-tool/ — przycisk
+instaluje dodatek od razu. Albo przeciągnij plik `.xpi` do okna Firefoksa.
+Wymagany Firefox 140+.

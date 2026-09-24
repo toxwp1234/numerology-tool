@@ -1,0 +1,201 @@
+<!doctype html>
+<html lang="pl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Numerology Tool</title>
+<meta name="description" content="Rozszerzenie do Firefoksa i Chrome: wartość numerologiczna zaznaczonego tekstu w menu kontekstowym.">
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><rect width='32' height='32' rx='8' fill='%235b4bdb'/><text x='16' y='23' font-family='Georgia,serif' font-size='20' text-anchor='middle' fill='white'>7</text></svg>">
+<style>
+  :root {
+    --bg: #f7f6f2;
+    --surface: #ffffff;
+    --text: #1d1b22;
+    --muted: #625e6b;
+    --border: #e3e0d8;
+    --accent: #5b4bdb;
+    --accent-text: #ffffff;
+    --accent-soft: #ece9ff;
+    --code-bg: #f0eee8;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root {
+      --bg: #141318;
+      --surface: #1d1c23;
+      --text: #ecebf0;
+      --muted: #a09cab;
+      --border: #2e2c36;
+      --accent: #8b7fff;
+      --accent-text: #141318;
+      --accent-soft: #28244a;
+      --code-bg: #26242d;
+    }
+  }
+  * { box-sizing: border-box; }
+  body {
+    margin: 0;
+    background: var(--bg);
+    color: var(--text);
+    font: 16px/1.6 system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+  }
+  main { max-width: 760px; margin: 0 auto; padding: 56px 16px 40px; }
+  h1 {
+    font-family: Georgia, "Times New Roman", serif;
+    font-weight: 400;
+    font-size: clamp(2.2rem, 7vw, 3.2rem);
+    line-height: 1.1;
+    margin: 0 0 12px;
+  }
+  h2 { font-size: 1.15rem; margin: 0 0 12px; }
+  .lead { color: var(--muted); font-size: 1.1rem; margin: 0 0 8px; max-width: 34em; }
+  .version { color: var(--muted); font-size: .9rem; margin: 0 0 32px; }
+  .cards { display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 16px; }
+  .card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 14px;
+    padding: 24px;
+  }
+  .card.primary { border-color: var(--accent); box-shadow: 0 0 0 1px var(--accent); }
+  .btn {
+    display: inline-block;
+    padding: 11px 18px;
+    border-radius: 10px;
+    background: var(--accent);
+    color: var(--accent-text);
+    font-weight: 600;
+    text-decoration: none;
+    margin: 4px 0 16px;
+  }
+  .btn.secondary { background: var(--accent-soft); color: var(--text); }
+  .btn:focus-visible { outline: 3px solid var(--text); outline-offset: 2px; }
+  ol { padding-left: 1.3em; margin: 0; color: var(--muted); font-size: .95rem; }
+  li + li { margin-top: 4px; }
+  code {
+    background: var(--code-bg);
+    padding: 1px 6px;
+    border-radius: 5px;
+    font-size: .88em;
+    word-break: break-all;
+  }
+  section { margin-top: 48px; }
+  .try input {
+    width: 100%;
+    font: inherit;
+    padding: 12px 14px;
+    border-radius: 10px;
+    border: 1px solid var(--border);
+    background: var(--surface);
+    color: var(--text);
+  }
+  .try input:focus { outline: 2px solid var(--accent); outline-offset: 1px; }
+  .menu {
+    margin-top: 12px;
+    display: inline-block;
+    min-width: 200px;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 6px;
+    box-shadow: 0 6px 20px rgba(0,0,0,.08);
+    font-size: .95rem;
+  }
+  .menu div { padding: 6px 12px; color: var(--muted); }
+  .menu .hit { background: var(--accent-soft); color: var(--text); border-radius: 5px; font-variant-numeric: tabular-nums; }
+  .note { color: var(--muted); font-size: .92rem; }
+  footer { margin-top: 56px; padding-top: 20px; border-top: 1px solid var(--border); color: var(--muted); font-size: .9rem; }
+  footer a, .note a { color: var(--accent); }
+</style>
+</head>
+<body>
+<main>
+  <h1>Numerology Tool</h1>
+  <p class="lead">Zaznacz tekst na dowolnej stronie, kliknij prawym przyciskiem — w menu od razu zobaczysz jego wartość numerologiczną: <strong>zredukowana / surowa</strong>.</p>
+  <p class="version">Wersja __VERSION__ · nie zbiera żadnych danych</p>
+
+  <div class="cards">
+    <div class="card" id="firefox">
+      <h2>Firefox</h2>
+      <a class="btn" href="numerology-tool.xpi">Zainstaluj w Firefoksie</a>
+      <ol>
+        <li>Kliknij przycisk powyżej.</li>
+        <li>Jeśli Firefox zablokuje instalację, kliknij <strong>Zezwól</strong>.</li>
+        <li>Potwierdź <strong>Dodaj</strong>. Gotowe — dodatek jest podpisany przez Mozillę.</li>
+      </ol>
+    </div>
+    <div class="card" id="chrome">
+      <h2>Chrome / Edge</h2>
+      <a class="btn" href="numerology-tool-chrome.zip">Pobierz .zip</a>
+      <ol>
+        <li>Rozpakuj plik do folderu, którego nie usuniesz.</li>
+        <li>Otwórz <code>chrome://extensions</code> i włącz <strong>Tryb dewelopera</strong>.</li>
+        <li><strong>Załaduj rozpakowane</strong> → wskaż rozpakowany folder.</li>
+      </ol>
+    </div>
+  </div>
+
+  <section class="try">
+    <h2>Wypróbuj tutaj</h2>
+    <label for="text" class="note">Wpisz tekst — tak wygląda to w menu kontekstowym:</label>
+    <input id="text" type="text" value="Hello" autocomplete="off" spellcheck="false">
+    <div class="menu" aria-live="polite">
+      <div>Kopiuj</div>
+      <div class="hit" id="result">7 / 25</div>
+      <div>Wyszukaj…</div>
+    </div>
+  </section>
+
+  <section>
+    <h2>Jak to liczy</h2>
+    <p class="note">Litery A–Z mają wartości 1–9 (A=1 … I=9, J=1 …), cyfry liczą się same za siebie, pozostałe znaki są pomijane. Suma to wartość <em>surowa</em>; jej cyfry dodaje się aż do jednej cyfry — to wartość <em>zredukowana</em>. Liczby mistrzowskie 11, 22 i 33 nie są redukowane.</p>
+  </section>
+
+  <footer>
+    Kod źródłowy: <a href="https://github.com/toxwp1234/numerology-tool">github.com/toxwp1234/numerology-tool</a>
+  </footer>
+</main>
+<script>
+  // Ta sama logika co w content.js rozszerzenia
+  function calculateRaw(text) {
+    let total = 0;
+    const clean = text.toUpperCase();
+    for (let i = 0; i < clean.length; i++) {
+      const code = clean.charCodeAt(i);
+      if (code >= 65 && code <= 90) total += ((code - 65) % 9) + 1;
+      else if (code >= 48 && code <= 57) total += code - 48;
+    }
+    return total;
+  }
+  function reduceToSingleDigit(n) {
+    if (n === 11 || n === 22 || n === 33) return n;
+    while (n > 9) {
+      let sum = 0;
+      const str = n.toString();
+      for (let i = 0; i < str.length; i++) sum += parseInt(str[i]);
+      n = sum;
+      if (n === 11 || n === 22 || n === 33) return n;
+    }
+    return n;
+  }
+  const input = document.getElementById("text");
+  const result = document.getElementById("result");
+  input.addEventListener("input", () => {
+    const t = input.value.trim();
+    if (!t) { result.textContent = "Numerologia: zaznacz tekst"; return; }
+    const raw = calculateRaw(t);
+    result.textContent = `${reduceToSingleDigit(raw)} / ${raw}`;
+  });
+
+  // Wyróżnij kartę przeglądarki, której używa odwiedzający
+  const isFirefox = /firefox/i.test(navigator.userAgent);
+  const card = document.getElementById(isFirefox ? "firefox" : "chrome");
+  card.classList.add("primary");
+  if (!isFirefox) {
+    document.querySelector("#firefox .btn").classList.add("secondary");
+    document.querySelector(".cards").prepend(card);
+  } else {
+    document.querySelector("#chrome .btn").classList.add("secondary");
+  }
+</script>
+</body>
+</html>
