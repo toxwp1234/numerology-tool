@@ -36,29 +36,30 @@
   .values td { font-size: .9em; }
   .note { margin: 0; color: #666; font-size: .9em; }
   .note a { color: #1f5f8b; }
-  .extension { margin-top: 48px; padding: 14px 18px; border: 1px solid #dfe6ec; border-radius: 4px; background: #f7fafc; }
-  .extension summary { cursor: pointer; color: #444; }
-  .extension summary strong { color: #1f5f8b; }
-  .ext-body { display: grid; gap: 24px 40px; margin-top: 16px; }
+  .lede { margin: 0 0 20px; color: #444; }
+  .ext-body { display: grid; gap: 24px 48px; align-items: start; }
   @media (min-width: 760px) { .ext-body { grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); } }
-  .versions { display: grid; gap: 16px; }
-  .versions p { margin: 0 0 4px; }
-  .versions a { color: #1f5f8b; }
-  .demo { position: relative; overflow: hidden; background: #fff; border: 1px solid #ddd; border-radius: 4px; padding: 16px 16px 112px; font-size: .95em; }
+  .versions { display: grid; gap: 18px; }
+  .download { display: flex; justify-content: space-between; align-items: center; gap: 12px; padding: 10px 14px; margin-bottom: 6px; border: 1px solid #c9d6e0; border-radius: 4px; color: #222; text-decoration: none; }
+  .download:hover { border-color: #1f5f8b; background: #f5f9fc; }
+  .download span { color: #1f5f8b; font-size: .9em; white-space: nowrap; }
+  .download span::after { content: " 93"; }
+  .demo { border: 1px solid #ddd; border-radius: 4px; overflow: hidden; background: #fff; }
+  .demo .bar { display: flex; gap: 5px; padding: 8px 10px; background: #f5f5f5; border-bottom: 1px solid #e5e5e5; }
+  .demo .bar i { width: 8px; height: 8px; border-radius: 50%; background: #ccc; }
+  .demo .page { position: relative; padding: 18px 18px 120px; }
   .demo p { margin: 0; }
-  .demo mark { background: transparent; color: inherit; }
-  .demo .menu { position: absolute; left: min(120px, 25%); top: 48px; width: 170px; max-width: calc(100% - 32px); box-sizing: border-box; padding: 4px; background: #fff; border: 1px solid #bbb; border-radius: 4px; font-size: .9em; opacity: 0; }
+  .demo mark { background: transparent; color: inherit; animation: select 5s infinite; }
+  .demo .menu { position: absolute; left: min(130px, 30%); top: 50px; width: 170px; max-width: calc(100% - 36px); box-sizing: border-box; padding: 4px; background: #fff; border: 1px solid #bbb; border-radius: 4px; font-size: .9em; animation: menu 5s infinite; }
   .demo .menu div { padding: 4px 10px; color: #555; }
+  .demo .menu hr { border: 0; border-top: 1px solid #e5e5e5; margin: 4px 0; }
   .demo .menu .hit { background: #1f5f8b; color: #fff; font-weight: 600; border-radius: 2px; }
-  .extension[open] .demo mark { animation: select 5s infinite; }
-  .extension[open] .demo .menu { animation: menu 5s infinite; }
   @keyframes select { 0%, 10% { background: transparent; } 20%, 90% { background: #b3d4fc; } 100% { background: transparent; } }
   @keyframes menu { 0%, 30% { opacity: 0; } 36%, 90% { opacity: 1; } 100% { opacity: 0; } }
   @media (prefers-reduced-motion: reduce) {
     td { transition: none; }
-    .extension[open] .demo mark, .extension[open] .demo .menu { animation: none; }
-    .demo mark { background: #b3d4fc; }
-    .demo .menu { opacity: 1; }
+    .demo mark { animation: none; background: #b3d4fc; }
+    .demo .menu { animation: none; }
   }
 </style>
 </head>
@@ -96,27 +97,30 @@
     <p class="note">English Ordinal numbers the letters in alphabet order from 1 to 26. Reverse Ordinal counts from the end, so Z is 1 and A is 26. Reverse Reduction uses the values 1 to 9 counted from Z backwards.</p>
   </section>
 
-  <details class="extension">
-    <summary><strong>Numerology Tool for your browser.</strong> Select text on any page, right-click, and see its number. Click to see how it works.</summary>
+  <section class="group" id="extension">
+    <h2>Browser extension</h2>
+    <p class="lede">Numerology Tool adds the Pythagorean number of any text you select to the right-click menu, on every website.</p>
     <div class="ext-body">
       <div class="demo" aria-hidden="true">
-        <p>Welcome back, <mark id="demo-word">Zbych19</mark>. You have 3 new messages.</p>
-        <div class="menu"><div>Copy</div><div>Search the web</div><div class="hit" id="demo-value"></div></div>
+        <div class="bar"><i></i><i></i><i></i></div>
+        <div class="page">
+          <p>Welcome back, <mark id="demo-word">Zbych19</mark>. You have 3 new messages.</p>
+          <div class="menu"><div>Copy</div><div>Select All</div><hr><div class="hit" id="demo-value"></div></div>
+        </div>
       </div>
       <div class="versions">
         <div>
-          <h3>Firefox</h3>
-          <p><a href="https://github.com/toxwp1234/numerology-tool/releases/latest/download/numerology-tool.xpi">Download numerology-tool.xpi</a></p>
-          <p class="note">Drag the file into a Firefox window and click Add. Signed by Mozilla. Firefox 140 or newer.</p>
+          <a class="download" href="https://github.com/toxwp1234/numerology-tool/releases/latest/download/numerology-tool.xpi"><strong>Firefox</strong><span>Download .xpi</span></a>
+          <p class="note">Drag the file into a Firefox window and click Add. Signed by Mozilla, needs Firefox 140 or newer.</p>
         </div>
         <div>
-          <h3>Chrome, Edge, Brave</h3>
-          <p><a href="https://github.com/toxwp1234/numerology-tool/releases/latest/download/numerology-tool-chrome.zip">Download numerology-tool-chrome.zip</a></p>
-          <p class="note">Unzip it, open chrome://extensions, turn on Developer mode and choose Load unpacked. <a href="https://github.com/toxwp1234/numerology-tool#install">Full steps</a>.</p>
+          <a class="download" href="https://github.com/toxwp1234/numerology-tool/releases/latest/download/numerology-tool-chrome.zip"><strong>Chrome, Edge, Brave</strong><span>Download .zip</span></a>
+          <p class="note">Unzip it, open chrome://extensions, turn on Developer mode and choose Load unpacked.</p>
         </div>
+        <p class="note"><a href="https://github.com/toxwp1234/numerology-tool#install">Full installation steps</a></p>
       </div>
     </div>
-  </details>
+  </section>
 </main>
 <script src="core/numerology.js"></script>
 <script>
