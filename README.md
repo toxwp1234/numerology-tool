@@ -5,7 +5,8 @@ text you select. Highlight a word, name or date on any web page, right-click, an
 value appears in the context menu as **reduced / raw**, for example `7 / 25` for
 "Hello".
 
-**Download:** https://toxwp1234.github.io/numerology-tool/
+**Website and download:** https://toxwp1234.github.io/numerology-tool/, which
+also has a calculator showing the Pythagorean and Chaldean values of any name.
 
 ## Install
 
@@ -57,7 +58,8 @@ sends nothing anywhere.
 ```
 chrome/     Chrome / Edge version (Manifest V3, service worker)
 firefox/    Firefox version (Manifest V3, background script)
-site/       download page, published to GitHub Pages
+core/       numerology systems (Pythagorean, Chaldean), used by the website
+site/       calculator and download page, published to GitHub Pages
 scripts/    release helper
 .github/workflows/
   release.yml   signs the Firefox build with Mozilla and creates a GitHub Release
@@ -88,4 +90,6 @@ Mozilla signs each version number only once. It needs the repository secrets
 `AMO_JWT_ISSUER` and `AMO_JWT_SECRET` (API keys from
 https://addons.mozilla.org/developers/addon/api/key/).
 
-Changes to `site/` go live on their own after a push, without a new release.
+Changes to `site/` or `core/` go live on their own after a push, without a new
+release. To preview the site locally, run `python -m http.server --directory site`
+after copying `core/` into `site/core/`.

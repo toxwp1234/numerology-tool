@@ -3,3 +3,5 @@ web-ext-artifacts/
 *.xpi
 *.zip
 .env
+site/core/
+.claude/
