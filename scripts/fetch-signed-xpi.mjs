@@ -1,8 +1,8 @@
-// Pobiera podpisany .xpi z addons.mozilla.org dla wersji z firefox/manifest.json.
-// Używane, gdy `web-ext sign` nie doczekał się zatwierdzenia albo wersja była już
-// wcześniej wysłana — wtedy czekamy, aż Mozilla ją podpisze, i ściągamy plik.
+// Downloads the signed .xpi from addons.mozilla.org for the version in firefox/manifest.json.
+// Used when `web-ext sign` gave up waiting for approval, or the version was already
+// uploaded earlier: waits until Mozilla signs it, then downloads the file.
 //
-// Wymaga: WEB_EXT_API_KEY, WEB_EXT_API_SECRET. Opcjonalnie: WAIT_MINUTES (domyślnie 60).
+// Requires: WEB_EXT_API_KEY, WEB_EXT_API_SECRET. Optional: WAIT_MINUTES (default 60).
 import { createHmac, randomUUID } from "node:crypto";
 import { mkdirSync, readFileSync, writeFileSync } from "node:fs";
 
@@ -17,7 +17,7 @@ const waitMinutes = Number(process.env.WAIT_MINUTES || 60);
 
 if (!key || !secret) throw new Error("WEB_EXT_API_KEY / WEB_EXT_API_SECRET not set");
 
-// Krótkotrwały token JWT (HS256) — sam sekret nigdy nie jest wysyłany
+// Short-lived JWT (HS256); the secret itself is never sent
 const b64 = (obj) => Buffer.from(JSON.stringify(obj)).toString("base64url");
 function authHeaders() {
   const now = Math.floor(Date.now() / 1000);

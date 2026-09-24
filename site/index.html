@@ -1,161 +1,251 @@
 <!doctype html>
-<html lang="pl">
+<html lang="en">
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Numerology Tool</title>
-<meta name="description" content="Rozszerzenie do Firefoksa i Chrome: wartość numerologiczna zaznaczonego tekstu w menu kontekstowym.">
-<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><rect width='32' height='32' rx='8' fill='%235b4bdb'/><text x='16' y='23' font-family='Georgia,serif' font-size='20' text-anchor='middle' fill='white'>7</text></svg>">
+<meta name="description" content="A Firefox and Chrome extension that shows the numerology value of any text you select, right in the right-click menu.">
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><rect width='32' height='32' rx='6' fill='%232b4bb5'/><text x='16' y='23' font-family='monospace' font-size='19' text-anchor='middle' fill='white'>7</text></svg>">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&family=IBM+Plex+Sans:wght@400;500;600&family=Newsreader:opsz,wght@6..72,500&display=swap">
 <style>
   :root {
-    --bg: #f7f6f2;
-    --surface: #ffffff;
-    --text: #1d1b22;
-    --muted: #625e6b;
-    --border: #e3e0d8;
-    --accent: #5b4bdb;
-    --accent-text: #ffffff;
-    --accent-soft: #ece9ff;
-    --code-bg: #f0eee8;
+    --paper: #f3f5f2;
+    --sheet: #fbfcfa;
+    --ink: #1b2320;
+    --muted: #5b6863;
+    --rule: #d5dbd6;
+    --rule-strong: #b9c2bc;
+    --accent: #2b4bb5;
+    --accent-ink: #ffffff;
+    --accent-wash: #e3e8f8;
+    --serif: "Newsreader", Georgia, "Times New Roman", serif;
+    --sans: "IBM Plex Sans", system-ui, -apple-system, "Segoe UI", sans-serif;
+    --mono: "IBM Plex Mono", ui-monospace, "Cascadia Mono", Consolas, monospace;
+    color-scheme: light;
   }
   @media (prefers-color-scheme: dark) {
     :root {
-      --bg: #141318;
-      --surface: #1d1c23;
-      --text: #ecebf0;
-      --muted: #a09cab;
-      --border: #2e2c36;
-      --accent: #8b7fff;
-      --accent-text: #141318;
-      --accent-soft: #28244a;
-      --code-bg: #26242d;
+      --paper: #121614;
+      --sheet: #181d1b;
+      --ink: #e4eae6;
+      --muted: #93a09a;
+      --rule: #2a322e;
+      --rule-strong: #3b4541;
+      --accent: #8fa8ff;
+      --accent-ink: #10152b;
+      --accent-wash: #232c4d;
+      color-scheme: dark;
     }
   }
+
   * { box-sizing: border-box; }
+  html { -webkit-text-size-adjust: 100%; }
   body {
     margin: 0;
-    background: var(--bg);
-    color: var(--text);
-    font: 16px/1.6 system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+    padding-inline: 16px;
+    background: var(--paper);
+    color: var(--ink);
+    font: 400 16px/1.6 var(--sans);
   }
-  main { max-width: 760px; margin: 0 auto; padding: 56px 16px 40px; }
+  .wrap { max-width: 880px; margin: 0 auto; }
+  a { color: var(--accent); text-underline-offset: 3px; }
+  a:focus-visible, button:focus-visible, input:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+
+  header.bar {
+    display: flex; justify-content: space-between; align-items: center; gap: 16px;
+    padding-block: 20px;
+    border-bottom: 1px solid var(--rule);
+    font-size: 14px;
+  }
+  .mark { display: flex; align-items: center; gap: 10px; font-weight: 600; letter-spacing: .01em; }
+  .mark span {
+    display: inline-grid; place-items: center; width: 26px; height: 26px;
+    background: var(--accent); color: var(--accent-ink);
+    font: 500 14px/1 var(--mono); border-radius: 5px;
+  }
+  header.bar a { color: var(--muted); text-decoration: none; }
+  header.bar a:hover { color: var(--ink); }
+
+  .hero { padding-block: 56px 40px; display: grid; gap: 20px; }
   h1 {
-    font-family: Georgia, "Times New Roman", serif;
-    font-weight: 400;
-    font-size: clamp(2.2rem, 7vw, 3.2rem);
-    line-height: 1.1;
-    margin: 0 0 12px;
+    font: 500 clamp(2.4rem, 6.5vw, 3.6rem)/1.05 var(--serif);
+    letter-spacing: -.015em; margin: 0; text-wrap: balance;
   }
-  h2 { font-size: 1.15rem; margin: 0 0 12px; }
-  .lead { color: var(--muted); font-size: 1.1rem; margin: 0 0 8px; max-width: 34em; }
-  .version { color: var(--muted); font-size: .9rem; margin: 0 0 32px; }
-  .cards { display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 16px; }
-  .card {
-    background: var(--surface);
-    border: 1px solid var(--border);
-    border-radius: 14px;
-    padding: 24px;
-  }
-  .card.primary { border-color: var(--accent); box-shadow: 0 0 0 1px var(--accent); }
+  .lede { font-size: 1.125rem; color: var(--muted); margin: 0; max-width: 36em; }
+  .lede b { color: var(--ink); font-weight: 500; font-family: var(--mono); font-size: .95em; }
+  .actions { display: flex; flex-wrap: wrap; gap: 12px; align-items: center; margin-top: 8px; }
   .btn {
-    display: inline-block;
-    padding: 11px 18px;
-    border-radius: 10px;
-    background: var(--accent);
-    color: var(--accent-text);
-    font-weight: 600;
-    text-decoration: none;
-    margin: 4px 0 16px;
+    display: inline-flex; align-items: center; gap: 8px;
+    padding: 11px 18px; border-radius: 6px;
+    font: 600 15px/1.2 var(--sans); text-decoration: none;
+    border: 1px solid var(--rule-strong); color: var(--ink); background: var(--sheet);
   }
-  .btn.secondary { background: var(--accent-soft); color: var(--text); }
-  .btn:focus-visible { outline: 3px solid var(--text); outline-offset: 2px; }
-  ol { padding-left: 1.3em; margin: 0; color: var(--muted); font-size: .95rem; }
-  li + li { margin-top: 4px; }
-  code {
-    background: var(--code-bg);
-    padding: 1px 6px;
-    border-radius: 5px;
-    font-size: .88em;
-    word-break: break-all;
+  .btn:hover { border-color: var(--ink); }
+  .btn.primary { background: var(--accent); border-color: var(--accent); color: var(--accent-ink); }
+  .btn.primary:hover { filter: brightness(1.08); }
+  .btn small { font: 400 12px/1 var(--mono); opacity: .8; }
+  .meta { font: 400 13px/1.5 var(--mono); color: var(--muted); }
+
+  section { padding-block: 40px; border-top: 1px solid var(--rule); }
+  h2 { font: 500 1.6rem/1.2 var(--serif); margin: 0 0 6px; text-wrap: balance; }
+  .sub { color: var(--muted); margin: 0 0 24px; max-width: 40em; }
+
+  .lab { display: grid; gap: 20px; }
+  .field label { display: block; font: 500 12px/1 var(--sans); letter-spacing: .08em; text-transform: uppercase; color: var(--muted); margin-bottom: 8px; }
+  .field input {
+    width: 100%; padding: 12px 14px; font: 500 1.25rem/1.3 var(--mono);
+    color: var(--ink); background: var(--sheet);
+    border: 1px solid var(--rule-strong); border-radius: 6px;
   }
-  section { margin-top: 48px; }
-  .try input {
-    width: 100%;
-    font: inherit;
-    padding: 12px 14px;
-    border-radius: 10px;
-    border: 1px solid var(--border);
-    background: var(--surface);
-    color: var(--text);
-  }
-  .try input:focus { outline: 2px solid var(--accent); outline-offset: 1px; }
-  .menu {
-    margin-top: 12px;
-    display: inline-block;
-    min-width: 200px;
-    background: var(--surface);
-    border: 1px solid var(--border);
+
+  .sheet {
+    background: var(--sheet);
+    border: 1px solid var(--rule);
     border-radius: 8px;
-    padding: 6px;
-    box-shadow: 0 6px 20px rgba(0,0,0,.08);
-    font-size: .95rem;
+    padding: 20px;
+    display: grid; gap: 20px;
   }
-  .menu div { padding: 6px 12px; color: var(--muted); }
-  .menu .hit { background: var(--accent-soft); color: var(--text); border-radius: 5px; font-variant-numeric: tabular-nums; }
-  .note { color: var(--muted); font-size: .92rem; }
-  footer { margin-top: 56px; padding-top: 20px; border-top: 1px solid var(--border); color: var(--muted); font-size: .9rem; }
-  footer a, .note a { color: var(--accent); }
+  .chart-scroll { overflow-x: auto; }
+  table.chart { border-collapse: collapse; width: 100%; font: 500 15px/1 var(--mono); font-variant-numeric: tabular-nums; }
+  .chart th, .chart td { border: 1px solid var(--rule); text-align: center; padding: 10px 0; width: 11.1%; position: relative; }
+  .chart th { color: var(--accent); font-weight: 500; background: var(--paper); }
+  .chart td { color: var(--muted); transition: background-color .15s, color .15s; }
+  .chart td.on { background: var(--accent-wash); color: var(--ink); }
+  .chart td sup { position: absolute; top: 3px; right: 5px; font-size: 10px; color: var(--accent); }
+
+  .working { font: 400 15px/1.9 var(--mono); font-variant-numeric: tabular-nums; overflow-wrap: anywhere; }
+  .working .t { white-space: nowrap; }
+  .working .t i { font-style: normal; color: var(--muted); }
+  .working .eq { color: var(--accent); font-weight: 500; }
+  .working .note { display: block; font: 400 13px/1.5 var(--sans); color: var(--muted); }
+
+  .menu-demo { display: flex; flex-wrap: wrap; gap: 16px 32px; align-items: center; }
+  .menu {
+    min-width: 220px; padding: 4px;
+    background: var(--sheet); border: 1px solid var(--rule-strong); border-radius: 6px;
+    font: 400 14px/1 var(--sans);
+    box-shadow: 0 8px 24px rgba(20, 30, 25, .10);
+  }
+  .menu div { padding: 8px 12px; color: var(--muted); border-radius: 4px; }
+  .menu hr { border: 0; border-top: 1px solid var(--rule); margin: 4px 0; }
+  .menu .ext { background: var(--accent); color: var(--accent-ink); font: 500 14px/1 var(--mono); }
+  .menu-caption { font-size: 14px; color: var(--muted); max-width: 26em; margin: 0; }
+
+  .install { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 320px), 1fr)); gap: 32px; }
+  .install h3 { font: 600 1rem/1.3 var(--sans); margin: 0 0 12px; display: flex; gap: 10px; align-items: baseline; }
+  .install h3 .meta { font-weight: 400; }
+  .install ol { margin: 0 0 16px; padding-left: 1.3em; display: grid; gap: 6px; }
+  .install li::marker { font-family: var(--mono); color: var(--muted); }
+  code { font: 400 .88em var(--mono); background: var(--sheet); border: 1px solid var(--rule); padding: 1px 5px; border-radius: 4px; }
+
+  .rules { display: grid; gap: 14px; max-width: 42em; margin: 0; }
+  .rules div { display: grid; grid-template-columns: 9rem 1fr; gap: 16px; }
+  .rules dt { font: 500 13px/1.6 var(--mono); color: var(--accent); }
+  .rules dd { margin: 0; }
+  @media (max-width: 560px) { .rules div { grid-template-columns: 1fr; gap: 2px; } }
+
+  footer { border-top: 1px solid var(--rule); padding-block: 24px 40px; display: flex; flex-wrap: wrap; justify-content: space-between; gap: 12px; font-size: 14px; color: var(--muted); }
+
+  @media (prefers-reduced-motion: reduce) { * { transition: none !important; } }
 </style>
 </head>
 <body>
-<main>
-  <h1>Numerology Tool</h1>
-  <p class="lead">Zaznacz tekst na dowolnej stronie, kliknij prawym przyciskiem — w menu od razu zobaczysz jego wartość numerologiczną: <strong>zredukowana / surowa</strong>.</p>
-  <p class="version">Wersja __VERSION__ · nie zbiera żadnych danych</p>
+<div class="wrap">
 
-  <div class="cards">
-    <div class="card" id="firefox">
-      <h2>Firefox</h2>
-      <a class="btn" href="numerology-tool.xpi">Zainstaluj w Firefoksie</a>
-      <ol>
-        <li>Kliknij przycisk powyżej.</li>
-        <li>Jeśli Firefox zablokuje instalację, kliknij <strong>Zezwól</strong>.</li>
-        <li>Potwierdź <strong>Dodaj</strong>. Gotowe — dodatek jest podpisany przez Mozillę.</li>
-      </ol>
+  <header class="bar">
+    <div class="mark"><span>7</span>Numerology Tool</div>
+    <a href="https://github.com/toxwp1234/numerology-tool">Source on GitHub</a>
+  </header>
+
+  <div class="hero">
+    <h1>Select any text. Right‑click. See its number.</h1>
+    <p class="lede">A browser extension that adds the numerology value of your selection to the right‑click menu, shown as <b>reduced / raw</b>. Works on any website.</p>
+    <div class="actions" id="actions">
+      <a class="btn primary" id="btn-firefox" href="numerology-tool.xpi">Add to Firefox <small>.xpi</small></a>
+      <a class="btn" id="btn-chrome" href="numerology-tool-chrome.zip">Download for Chrome <small>.zip</small></a>
     </div>
-    <div class="card" id="chrome">
-      <h2>Chrome / Edge</h2>
-      <a class="btn" href="numerology-tool-chrome.zip">Pobierz .zip</a>
-      <ol>
-        <li>Rozpakuj plik do folderu, którego nie usuniesz.</li>
-        <li>Otwórz <code>chrome://extensions</code> i włącz <strong>Tryb dewelopera</strong>.</li>
-        <li><strong>Załaduj rozpakowane</strong> → wskaż rozpakowany folder.</li>
-      </ol>
-    </div>
+    <div class="meta">Version __VERSION__ · signed by Mozilla · collects no data</div>
   </div>
 
-  <section class="try">
-    <h2>Wypróbuj tutaj</h2>
-    <label for="text" class="note">Wpisz tekst — tak wygląda to w menu kontekstowym:</label>
-    <input id="text" type="text" value="Hello" autocomplete="off" spellcheck="false">
-    <div class="menu" aria-live="polite">
-      <div>Kopiuj</div>
-      <div class="hit" id="result">7 / 25</div>
-      <div>Wyszukaj…</div>
+  <section id="try">
+    <h2>Try it here</h2>
+    <p class="sub">Type a word or name. Each letter is looked up in the chart, the values are added up, and the total is reduced to a single digit.</p>
+
+    <div class="lab">
+      <div class="field">
+        <label for="text">Text</label>
+        <input id="text" type="text" value="Hello" maxlength="120" autocomplete="off" spellcheck="false">
+      </div>
+
+      <div class="sheet">
+        <div class="chart-scroll">
+          <table class="chart" aria-label="Letter values: A to I are 1 to 9, J to R are 1 to 9, S to Z are 1 to 8">
+            <thead><tr id="chart-head"></tr></thead>
+            <tbody id="chart-body"></tbody>
+          </table>
+        </div>
+        <div class="working" id="working" aria-live="polite"></div>
+      </div>
+
+      <div class="menu-demo">
+        <div class="menu" aria-hidden="true">
+          <div>Copy</div>
+          <div>Select All</div>
+          <hr>
+          <div class="ext" id="menu-value">7 / 25</div>
+        </div>
+        <p class="menu-caption">This is what appears in your browser's right‑click menu when the text is selected on a page.</p>
+      </div>
     </div>
   </section>
 
-  <section>
-    <h2>Jak to liczy</h2>
-    <p class="note">Litery A–Z mają wartości 1–9 (A=1 … I=9, J=1 …), cyfry liczą się same za siebie, pozostałe znaki są pomijane. Suma to wartość <em>surowa</em>; jej cyfry dodaje się aż do jednej cyfry — to wartość <em>zredukowana</em>. Liczby mistrzowskie 11, 22 i 33 nie są redukowane.</p>
+  <section id="install">
+    <h2>Install</h2>
+    <p class="sub">Pick your browser. It takes under a minute.</p>
+    <div class="install">
+      <div>
+        <h3>Firefox <span class="meta">140 or newer</span></h3>
+        <ol>
+          <li>Click <a href="numerology-tool.xpi">Add to Firefox</a>.</li>
+          <li>If Firefox says it blocked the request, click <strong>Continue to installation</strong>.</li>
+          <li>Click <strong>Add</strong> in the prompt that follows.</li>
+        </ol>
+        <p class="meta">The add-on is signed by Mozilla, so it stays installed after restarting Firefox.</p>
+      </div>
+      <div>
+        <h3>Chrome, Edge, Brave <span class="meta">developer mode</span></h3>
+        <ol>
+          <li><a href="numerology-tool-chrome.zip">Download the .zip</a> and unzip it to a folder you'll keep.</li>
+          <li>Open <code>chrome://extensions</code> and turn on <strong>Developer mode</strong>.</li>
+          <li>Click <strong>Load unpacked</strong> and choose the unzipped folder.</li>
+        </ol>
+        <p class="meta">Chrome only installs store extensions directly, so this one loads as an unpacked extension.</p>
+      </div>
+    </div>
+  </section>
+
+  <section id="method">
+    <h2>How the numbers work</h2>
+    <p class="sub">The extension uses the Pythagorean letter chart.</p>
+    <dl class="rules">
+      <div><dt>Letters</dt><dd>A–I count as 1–9, then the count starts over: J = 1, K = 2 … S = 1 … Z = 8. Upper and lower case are the same.</dd></div>
+      <div><dt>Digits</dt><dd>Count as themselves, so <code>2025</code> is 2 + 0 + 2 + 5 = 9.</dd></div>
+      <div><dt>Everything else</dt><dd>Spaces, punctuation and accented letters are skipped.</dd></div>
+      <div><dt>Raw</dt><dd>The plain sum of all values.</dd></div>
+      <div><dt>Reduced</dt><dd>The digits of the sum are added together until one digit is left, except for the master numbers 11, 22 and 33, which are kept as they are.</dd></div>
+    </dl>
   </section>
 
   <footer>
-    Kod źródłowy: <a href="https://github.com/toxwp1234/numerology-tool">github.com/toxwp1234/numerology-tool</a>
+    <span>Numerology Tool · open source</span>
+    <span><a href="https://github.com/toxwp1234/numerology-tool/releases">All releases</a> · <a href="https://github.com/toxwp1234/numerology-tool/issues">Report a problem</a></span>
   </footer>
-</main>
+
+</div>
 <script>
-  // Ta sama logika co w content.js rozszerzenia
+  // Same calculation as the extension's content.js
   function calculateRaw(text) {
     let total = 0;
     const clean = text.toUpperCase();
@@ -166,35 +256,79 @@
     }
     return total;
   }
-  function reduceToSingleDigit(n) {
-    if (n === 11 || n === 22 || n === 33) return n;
-    while (n > 9) {
-      let sum = 0;
-      const str = n.toString();
-      for (let i = 0; i < str.length; i++) sum += parseInt(str[i]);
-      n = sum;
-      if (n === 11 || n === 22 || n === 33) return n;
+  function reductionSteps(n) {
+    const steps = [];
+    while (n > 9 && n !== 11 && n !== 22 && n !== 33) {
+      const digits = String(n).split("").map(Number);
+      n = digits.reduce((a, b) => a + b, 0);
+      steps.push({ digits, n });
     }
-    return n;
+    return steps;
   }
-  const input = document.getElementById("text");
-  const result = document.getElementById("result");
-  input.addEventListener("input", () => {
-    const t = input.value.trim();
-    if (!t) { result.textContent = "Numerologia: zaznacz tekst"; return; }
-    const raw = calculateRaw(t);
-    result.textContent = `${reduceToSingleDigit(raw)} / ${raw}`;
-  });
 
-  // Wyróżnij kartę przeglądarki, której używa odwiedzający
-  const isFirefox = /firefox/i.test(navigator.userAgent);
-  const card = document.getElementById(isFirefox ? "firefox" : "chrome");
-  card.classList.add("primary");
-  if (!isFirefox) {
-    document.querySelector("#firefox .btn").classList.add("secondary");
-    document.querySelector(".cards").prepend(card);
-  } else {
-    document.querySelector("#chrome .btn").classList.add("secondary");
+  const head = document.getElementById("chart-head");
+  const body = document.getElementById("chart-body");
+  head.innerHTML = [1, 2, 3, 4, 5, 6, 7, 8, 9].map(n => `<th scope="col">${n}</th>`).join("");
+  const cells = {};
+  for (let r = 0; r < 3; r++) {
+    const tr = document.createElement("tr");
+    for (let c = 0; c < 9; c++) {
+      const td = document.createElement("td");
+      const letter = String.fromCharCode(65 + r * 9 + c);
+      if (r * 9 + c < 26) { td.textContent = letter; cells[letter] = td; }
+      tr.appendChild(td);
+    }
+    body.appendChild(tr);
+  }
+
+  const input = document.getElementById("text");
+  const working = document.getElementById("working");
+  const menuValue = document.getElementById("menu-value");
+
+  function render() {
+    const text = input.value.trim();
+    const counts = {};
+    const terms = [];
+    for (const ch of text.toUpperCase()) {
+      const code = ch.charCodeAt(0);
+      if (code >= 65 && code <= 90) {
+        counts[ch] = (counts[ch] || 0) + 1;
+        terms.push(`<span class="t">${ch}<i>${((code - 65) % 9) + 1}</i></span>`);
+      } else if (code >= 48 && code <= 57) {
+        terms.push(`<span class="t">${ch}</span>`);
+      }
+    }
+    for (const [letter, td] of Object.entries(cells)) {
+      const n = counts[letter] || 0;
+      td.classList.toggle("on", n > 0);
+      td.innerHTML = letter + (n > 1 ? `<sup>×${n}</sup>` : "");
+    }
+
+    if (!terms.length) {
+      working.innerHTML = `<span class="note">No letters or digits yet. Type something above.</span>`;
+      menuValue.textContent = "Numerologia: zaznacz tekst";
+      return;
+    }
+    const raw = calculateRaw(text);
+    const steps = reductionSteps(raw);
+    const reduced = steps.length ? steps[steps.length - 1].n : raw;
+    const shown = terms.length > 30 ? terms.slice(0, 30).join(" + ") + " + …" : terms.join(" + ");
+    let html = `${shown} = <span class="eq">${raw}</span>`;
+    for (const s of steps) html += ` → ${s.digits.join("+")} = <span class="eq">${s.n}</span>`;
+    if ([11, 22, 33].includes(reduced)) html += `<span class="note">${reduced} is a master number, so it isn't reduced further.</span>`;
+    working.innerHTML = html;
+    menuValue.textContent = `${reduced} / ${raw}`;
+  }
+  input.addEventListener("input", render);
+  render();
+
+  // Put the visitor's browser first
+  if (!/firefox/i.test(navigator.userAgent)) {
+    const ff = document.getElementById("btn-firefox");
+    const cr = document.getElementById("btn-chrome");
+    ff.classList.remove("primary");
+    cr.classList.add("primary");
+    document.getElementById("actions").prepend(cr);
   }
 </script>
 </body>

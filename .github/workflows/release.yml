@@ -1,15 +1,15 @@
 name: Release
 
-# Wydanie nowej wersji:
-#   1. podnieś "version" w firefox/manifest.json i chrome/manifest.json (np. 1.1)
-#   2. git commit, potem: git tag v1.1 && git push origin main v1.1
+# To release a new version:
+#   1. bump "version" in firefox/manifest.json and chrome/manifest.json (e.g. 1.1)
+#   2. commit, then: git tag v1.1 && git push origin main v1.1
 on:
   push:
     tags: ["v*"]
 
 permissions:
-  contents: write   # tworzenie GitHub Release
-  actions: write    # uruchomienie workflow strony
+  contents: write   # create the GitHub Release
+  actions: write    # trigger the website workflow
 
 jobs:
   release:
@@ -35,8 +35,8 @@ jobs:
       - name: Lint Firefox extension
         run: npx --yes web-ext lint --source-dir firefox
 
-      # Wysyła kod do Mozilli. Jeśli zatwierdzenie trwa dłużej niż 10 min albo ta
-      # wersja była już wysłana (ponowne uruchomienie), przechodzimy do kroku niżej.
+      # Uploads the code to Mozilla. If approval takes longer than 10 min, or this
+      # version was already uploaded (a re-run), the next step picks it up.
       - name: Sign Firefox extension with Mozilla (unlisted)
         id: sign
         continue-on-error: true
@@ -69,8 +69,8 @@ jobs:
             dist/numerology-tool.xpi
             dist/numerology-tool-chrome.zip
 
-      # Tag nie może wdrażać na github-pages (ochrona środowiska), więc
-      # odpalamy workflow strony na gałęzi main.
+      # A tag can't deploy to github-pages (environment protection), so run
+      # the website workflow on main instead.
       - name: Update website
         env:
           GH_TOKEN: ${{ github.token }}

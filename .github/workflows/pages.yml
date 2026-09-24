@@ -1,6 +1,6 @@
 name: Deploy website
 
-# Strona z folderu site/ + pliki z najnowszego GitHub Release → GitHub Pages
+# Publishes site/ plus the files from the latest GitHub Release to GitHub Pages
 on:
   push:
     branches: [main]
@@ -34,7 +34,7 @@ jobs:
             sed -i "s/__VERSION__/${TAG}/g" site/index.html
           else
             echo "No release yet — deploying page without download files"
-            sed -i "s/__VERSION__/wkrótce/g" site/index.html
+            sed -i "s/__VERSION__/coming soon/g" site/index.html
           fi
 
       - uses: actions/configure-pages@v5
