@@ -116,7 +116,7 @@
   });
 
   const input = document.getElementById("name");
-  input.addEventListener("input", () => {
+  function render() {
     const text = input.value.trim();
     const used = new Set(text.toUpperCase());
     for (const [letter, td] of cells) td.classList.toggle("used", used.has(letter));
@@ -136,7 +136,22 @@
       working.scrollLeft = working.scrollWidth;
       final.innerHTML = `${mark(r.raw)} <span>/ ${mark(r.reduced)}</span>`;
     }
+  }
+
+  let urlTimer;
+  input.addEventListener("input", () => {
+    render();
+    clearTimeout(urlTimer);
+    urlTimer = setTimeout(() => {
+      const url = new URL(location.href);
+      const text = input.value.trim();
+      if (text) url.searchParams.set("t", text); else url.searchParams.delete("t");
+      history.replaceState(null, "", url);
+    }, 300);
   });
+
+  const shared = new URLSearchParams(location.search).get("t");
+  if (shared) { input.value = shared; render(); }
 </script>
 </body>
 </html>
