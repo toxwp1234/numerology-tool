@@ -35,7 +35,11 @@ jobs:
       - name: Lint Firefox extension
         run: npx --yes web-ext lint --source-dir firefox
 
+      # Wysyła kod do Mozilli. Jeśli zatwierdzenie trwa dłużej niż 10 min albo ta
+      # wersja była już wysłana (ponowne uruchomienie), przechodzimy do kroku niżej.
       - name: Sign Firefox extension with Mozilla (unlisted)
+        id: sign
+        continue-on-error: true
         env:
           WEB_EXT_API_KEY: ${{ secrets.AMO_JWT_ISSUER }}
           WEB_EXT_API_SECRET: ${{ secrets.AMO_JWT_SECRET }}
@@ -44,7 +48,15 @@ jobs:
             --source-dir firefox \
             --artifacts-dir dist \
             --channel unlisted \
-            --approval-timeout 900000
+            --approval-timeout 600000
+
+      - name: Wait for Mozilla approval and download signed file
+        if: steps.sign.outcome == 'failure'
+        env:
+          WEB_EXT_API_KEY: ${{ secrets.AMO_JWT_ISSUER }}
+          WEB_EXT_API_SECRET: ${{ secrets.AMO_JWT_SECRET }}
+          WAIT_MINUTES: 90
+        run: node scripts/fetch-signed-xpi.mjs
 
       - name: Package release files
         run: |
