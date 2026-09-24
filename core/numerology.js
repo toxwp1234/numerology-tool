@@ -20,6 +20,21 @@
     },
   };
 
+  const ALPHABET = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
+  function chartFrom(valueOf) {
+    const chart = {};
+    [...ALPHABET].forEach((letter, i) => {
+      const v = valueOf(i);
+      chart[v] = (chart[v] || "") + letter;
+    });
+    return chart;
+  }
+  SYSTEMS.englishOrdinal = { name: "English Ordinal", group: "gematria", chart: chartFrom(i => i + 1), masters: [11, 22, 33] };
+  SYSTEMS.reverseOrdinal = { name: "Reverse Ordinal", group: "gematria", chart: chartFrom(i => 26 - i), masters: [11, 22, 33] };
+  SYSTEMS.reverseReduction = { name: "Reverse Reduction", group: "gematria", chart: chartFrom(i => ((25 - i) % 9) + 1), masters: [11, 22, 33] };
+  SYSTEMS.pythagorean.group = "numerology";
+  SYSTEMS.chaldean.group = "numerology";
+
   for (const system of Object.values(SYSTEMS)) {
     system.values = {};
     for (const [value, letters] of Object.entries(system.chart)) {

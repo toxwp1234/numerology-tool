@@ -8,7 +8,8 @@ value appears in the context menu as **reduced / raw**, for example `7 / 25` for
 **Download:** [Releases](https://github.com/toxwp1234/numerology-tool/releases/latest)
 
 **Calculator:** https://toxwp1234.github.io/numerology-tool/ shows the Pythagorean
-and Chaldean values of any name.
+and Chaldean values of any name, plus the English Ordinal, Reverse Ordinal and
+Reverse Reduction gematria ciphers.
 
 ## Install
 
@@ -59,7 +60,7 @@ sends nothing anywhere.
 ```
 chrome/     Chrome / Edge version (Manifest V3, service worker)
 firefox/    Firefox version (Manifest V3, background script)
-core/       numerology systems (Pythagorean, Chaldean), used by the website
+core/       numerology systems and gematria ciphers, used by the website
 site/       calculator page, published to GitHub Pages
 scripts/    release helper
 .github/workflows/

@@ -5,93 +5,136 @@
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Numerology calculator</title>
 <style>
-  body { margin: 0; padding: 32px 16px; background: #fff; color: #222; font: 16px/1.6 system-ui, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; }
+  body { margin: 0; padding: 0 16px 64px; background: #fff; color: #222; font: 16px/1.6 system-ui, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; }
   main { max-width: 64em; margin: 0 auto; }
+  .intro { padding-top: max(32px, calc(31vh - 95px)); }
   h1 { font-size: 1.7em; font-weight: 600; margin: 0 0 20px; }
   label { display: block; margin-bottom: 6px; }
   input { font: inherit; font-size: 1.1em; padding: 7px 10px; width: 100%; max-width: 22em; box-sizing: border-box; border: 1px solid #999; border-radius: 4px; }
   input:focus { border-color: #1f5f8b; outline: 2px solid #cfe0ee; }
-  .systems { display: grid; gap: 32px 48px; margin-top: 32px; }
-  @media (min-width: 760px) { .systems { grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); } }
+  .group { margin-top: 48px; }
+  h2 { font-size: 1.3em; font-weight: 600; margin: 0 0 16px; padding-bottom: 6px; border-bottom: 1px solid #e3e3e3; }
+  .systems { display: grid; gap: 32px 48px; }
+  @media (min-width: 760px) {
+    .systems { grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); }
+    .systems.three { grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 24px 32px; }
+  }
   .system { min-width: 0; }
-  h2 { font-size: 1.15em; font-weight: 600; color: #1f5f8b; margin: 0 0 4px; }
+  h3 { font-size: 1.1em; font-weight: 600; color: #1f5f8b; margin: 0 0 4px; }
   .final { font-size: 2em; font-weight: 600; line-height: 1.2; margin: 0; font-variant-numeric: tabular-nums; }
   .final span { color: #888; font-weight: 400; }
   .final.empty { color: #ccc; }
   .working { font-family: Consolas, "Courier New", monospace; font-size: .95em; color: #444; line-height: 24px; height: 40px; box-sizing: border-box; padding-bottom: 14px; margin: 6px 0 0; white-space: nowrap; overflow-x: auto; overflow-y: hidden; }
   .working sub { font-size: .75em; line-height: 0; vertical-align: baseline; position: relative; top: .35em; color: #888; }
+  .special { text-decoration: underline dotted #c9a227 2px; text-underline-offset: 4px; cursor: help; }
   table { border-collapse: collapse; width: 100%; table-layout: fixed; margin: 12px 0 10px; }
   th, td { border: 1px solid #ddd; text-align: center; height: 2em; }
   th { background: #f5f5f5; color: #666; font-weight: 600; }
   td { transition: background-color .15s; }
-  td.used { background: #d6e6f3; color: #0f3d5c; font-weight: 600; }
+  .used { background: #d6e6f3; color: #0f3d5c; font-weight: 600; }
+  .values th:first-child { width: 8.5em; text-align: left; padding-left: 8px; font-weight: 400; }
+  .values td { font-size: .9em; }
   .note { margin: 0; color: #666; font-size: .9em; }
   @media (prefers-reduced-motion: reduce) { td { transition: none; } }
 </style>
 </head>
 <body>
 <main>
-  <h1>Numerology calculator</h1>
-
-  <label for="name">Enter the name:</label>
-  <input id="name" type="text" autocomplete="off" spellcheck="false" autofocus>
-
-  <div class="systems">
-    <section class="system">
-      <h2>Pythagorean</h2>
-      <p class="final empty" id="pythagorean-final">0</p>
-      <p class="working" id="pythagorean-working"></p>
-      <table id="pythagorean-chart"></table>
-      <p class="note">Each letter takes the number of its column, from 1 to 9. The total is reduced by adding its digits until one digit is left. The master numbers 11, 22 and 33 are not reduced.</p>
-    </section>
-
-    <section class="system">
-      <h2>Chaldean</h2>
-      <p class="final empty" id="chaldean-final">0</p>
-      <p class="working" id="chaldean-working"></p>
-      <table id="chaldean-chart"></table>
-      <p class="note">Letters are grouped by sound and take values from 1 to 8. No letter has the value 9. The total before reducing is called the compound number.</p>
-    </section>
+  <div class="intro">
+    <h1>Numerology calculator</h1>
+    <label for="name">Enter the name:</label>
+    <input id="name" type="text" autocomplete="off" spellcheck="false" autofocus>
   </div>
+
+  <section class="group">
+    <h2>Numerology</h2>
+    <div class="systems">
+      <div class="system" id="pythagorean">
+        <h3>Pythagorean</h3>
+        <p class="note">Each letter takes the number of its column, from 1 to 9. The total is reduced by adding its digits until one digit is left. The master numbers 11, 22 and 33 are not reduced.</p>
+      </div>
+      <div class="system" id="chaldean">
+        <h3>Chaldean</h3>
+        <p class="note">Letters are grouped by sound and take values from 1 to 8. No letter has the value 9. The total before reducing is called the compound number.</p>
+      </div>
+    </div>
+  </section>
+
+  <section class="group">
+    <h2>Gematria</h2>
+    <div class="systems three">
+      <div class="system" id="englishOrdinal"><h3>English Ordinal</h3></div>
+      <div class="system" id="reverseOrdinal"><h3>Reverse Ordinal</h3></div>
+      <div class="system" id="reverseReduction"><h3>Reverse Reduction</h3></div>
+    </div>
+    <table class="values" id="gematria-a"></table>
+    <table class="values" id="gematria-b"></table>
+    <p class="note">English Ordinal numbers the letters in alphabet order from 1 to 26. Reverse Ordinal counts from the end, so Z is 1 and A is 26. Reverse Reduction uses the values 1 to 9 counted from Z backwards.</p>
+  </section>
 </main>
 <script src="core/numerology.js"></script>
 <script>
-  const cells = {};
-  for (const [id, system] of Object.entries(Numerology.SYSTEMS)) {
+  const { SYSTEMS, calculate } = Numerology;
+  const SPECIAL = { 11: "Master number 11", 22: "Master number 22", 33: "Master number 33", 28: "28" };
+  const mark = n => SPECIAL[n] ? `<span class="special" title="${SPECIAL[n]}">${n}</span>` : `${n}`;
+  const cells = [];
+
+  for (const [id, system] of Object.entries(SYSTEMS)) {
+    const box = document.getElementById(id);
+    box.querySelector("h3").insertAdjacentHTML("afterend", `<p class="final empty">0</p><p class="working"></p>`);
+    if (system.group !== "numerology") continue;
     const cols = Object.keys(system.chart);
     const depth = Math.max(...Object.values(system.chart).map(l => l.length));
-    const table = document.getElementById(`${id}-chart`);
+    const table = document.createElement("table");
     table.innerHTML = "<tr>" + cols.map(c => `<th>${c}</th>`).join("") + "</tr>";
-    cells[id] = {};
     for (let r = 0; r < depth; r++) {
       const tr = table.insertRow();
       for (const c of cols) {
         const td = tr.insertCell();
         const letter = system.chart[c][r];
-        if (letter) { td.textContent = letter; cells[id][letter] = td; }
+        if (letter) { td.textContent = letter; cells.push([letter, td]); }
       }
     }
+    box.querySelector(".working").after(table);
   }
+
+  const gematria = Object.values(SYSTEMS).filter(s => s.group === "gematria");
+  [["gematria-a", "ABCDEFGHIJKLM"], ["gematria-b", "NOPQRSTUVWXYZ"]].forEach(([tableId, letters]) => {
+    const table = document.getElementById(tableId);
+    const head = table.insertRow();
+    head.innerHTML = "<th></th>" + [...letters].map(l => `<th>${l}</th>`).join("");
+    [...letters].forEach((l, i) => cells.push([l, head.cells[i + 1]]));
+    for (const system of gematria) {
+      const tr = table.insertRow();
+      tr.innerHTML = `<th>${system.name}</th>`;
+      for (const l of letters) {
+        const td = tr.insertCell();
+        td.textContent = system.values[l];
+        cells.push([l, td]);
+      }
+    }
+  });
 
   const input = document.getElementById("name");
   input.addEventListener("input", () => {
     const text = input.value.trim();
-    for (const id of Object.keys(Numerology.SYSTEMS)) {
-      const r = Numerology.calculate(id, text);
-      const used = new Set(r.terms.map(t => t.char));
-      for (const [letter, td] of Object.entries(cells[id])) td.classList.toggle("used", used.has(letter));
+    const used = new Set(text.toUpperCase());
+    for (const [letter, td] of cells) td.classList.toggle("used", used.has(letter));
 
-      const final = document.getElementById(`${id}-final`);
-      const working = document.getElementById(`${id}-working`);
+    for (const id of Object.keys(SYSTEMS)) {
+      const r = calculate(id, text);
+      const box = document.getElementById(id);
+      const final = box.querySelector(".final");
+      const working = box.querySelector(".working");
       final.classList.toggle("empty", !r.terms.length);
       if (!r.terms.length) { final.textContent = "0"; working.innerHTML = ""; continue; }
 
       let line = r.terms.map(t => t.kind === "letter" ? `${t.char}<sub>${t.value}</sub>` : t.char).join(" + ");
-      line += ` = ${r.raw}`;
-      for (const s of r.steps) line += ` → ${s.digits.join("+")} = ${s.total}`;
+      line += ` = ${mark(r.raw)}`;
+      for (const s of r.steps) line += ` → ${s.digits.join("+")} = ${mark(s.total)}`;
       working.innerHTML = line;
       working.scrollLeft = working.scrollWidth;
-      final.innerHTML = `${r.raw} <span>/ ${r.reduced}</span>`;
+      final.innerHTML = `${mark(r.raw)} <span>/ ${mark(r.reduced)}</span>`;
     }
   });
 </script>
