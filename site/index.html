@@ -6,19 +6,24 @@
 <title>Numerology calculator</title>
 <style>
   body { margin: 0; padding: 32px 16px; background: #fff; color: #333; font: 16px/1.6 Tahoma, Geneva, sans-serif; }
-  main { max-width: 40em; }
+  main { max-width: 64em; }
   h1, h3 { color: #1f5f8b; font-weight: normal; }
   h1 { font-size: 1.8em; margin: 0 0 24px; }
-  h3 { font-size: 1.15em; margin: 0 0 4px; }
+  h3 { font-size: 1.25em; margin: 0 0 8px; }
   label { display: block; margin-bottom: 6px; }
   input { font: inherit; color: #1f5f8b; padding: 6px 8px; width: 100%; max-width: 24em; box-sizing: border-box; border: 1px solid #999; border-radius: 3px; }
-  .result, .system { margin-top: 32px; }
-  .working { font-family: Consolas, monospace; font-size: .95em; margin: 0; overflow-wrap: anywhere; }
-  .final { font-weight: bold; font-size: 1.4em; margin: 4px 0 0; }
-  table { border-collapse: collapse; margin: 8px 0; }
-  th, td { border: 1px solid #ccc; padding: 4px 10px; text-align: center; }
+  .systems { display: grid; gap: 32px 48px; margin-top: 32px; }
+  @media (min-width: 760px) { .systems { grid-template-columns: 1fr 1fr; } }
+  .final { font-weight: bold; font-size: 1.4em; margin: 0; }
+  .final small { font-weight: normal; font-size: .6em; color: #777; margin-left: 6px; }
+  .working { font-family: Consolas, monospace; margin: 4px 0 0; overflow-wrap: anywhere; }
+  .working sub { font-size: .7em; color: #777; }
+  table { border-collapse: collapse; margin: 16px 0 8px; }
+  th, td { border: 1px solid #ccc; padding: 4px 10px; text-align: center; min-width: 1.2em; }
   th { background: #f4f4f4; }
-  .system p { margin: 8px 0 0; }
+  td { transition: background-color .25s, color .25s; }
+  td.used { background: #1f5f8b; color: #fff; }
+  .system p.note { margin: 0; }
 </style>
 </head>
 <body>
@@ -28,54 +33,63 @@
   <label for="name">Enter the name:</label>
   <input id="name" type="text" autocomplete="off" spellcheck="false">
 
-  <div id="results" hidden>
-    <div class="result">
+  <div class="systems">
+    <div class="system">
       <h3>Pythagorean</h3>
-      <p class="working" id="pythagorean-working"></p>
-      <p class="final" id="pythagorean-final"></p>
+      <div class="result" id="pythagorean-result" hidden>
+        <p class="final" id="pythagorean-final"></p>
+        <p class="working" id="pythagorean-working"></p>
+      </div>
+      <table id="pythagorean-chart"></table>
+      <p class="note">Each letter takes the number of its column, from 1 to 9. The total is reduced by adding its digits until one digit is left. The master numbers 11, 22 and 33 are not reduced.</p>
     </div>
-    <div class="result">
+
+    <div class="system">
       <h3>Chaldean</h3>
-      <p class="working" id="chaldean-working"></p>
-      <p class="final" id="chaldean-final"></p>
+      <div class="result" id="chaldean-result" hidden>
+        <p class="final" id="chaldean-final"></p>
+        <p class="working" id="chaldean-working"></p>
+      </div>
+      <table id="chaldean-chart"></table>
+      <p class="note">Letters are grouped by sound and take values from 1 to 8. No letter has the value 9. The total before reducing is called the compound number.</p>
     </div>
-  </div>
-
-  <div class="system">
-    <h3>Pythagorean chart</h3>
-    <table id="pythagorean-chart"></table>
-    <p>Each letter takes the number of its column, from 1 to 9. The total is reduced by adding its digits until one digit is left. The master numbers 11, 22 and 33 are not reduced.</p>
-  </div>
-
-  <div class="system">
-    <h3>Chaldean chart</h3>
-    <table id="chaldean-chart"></table>
-    <p>Letters are grouped by sound and take values from 1 to 8. No letter has the value 9. The total before reducing is called the compound number.</p>
   </div>
 </main>
 <script src="core/numerology.js"></script>
 <script>
+  const cells = {};
   for (const [id, system] of Object.entries(Numerology.SYSTEMS)) {
     const cols = Object.keys(system.chart);
     const depth = Math.max(...Object.values(system.chart).map(l => l.length));
-    let html = "<tr>" + cols.map(c => `<th>${c}</th>`).join("") + "</tr>";
+    const table = document.getElementById(`${id}-chart`);
+    table.innerHTML = "<tr>" + cols.map(c => `<th>${c}</th>`).join("") + "</tr>";
+    cells[id] = {};
     for (let r = 0; r < depth; r++) {
-      html += "<tr>" + cols.map(c => `<td>${system.chart[c][r] || ""}</td>`).join("") + "</tr>";
+      const tr = table.insertRow();
+      for (const c of cols) {
+        const td = tr.insertCell();
+        const letter = system.chart[c][r];
+        if (letter) { td.textContent = letter; cells[id][letter] = td; }
+      }
     }
-    document.getElementById(`${id}-chart`).innerHTML = html;
   }
 
   const input = document.getElementById("name");
   input.addEventListener("input", () => {
     const text = input.value.trim();
-    document.getElementById("results").hidden = !text;
     for (const id of Object.keys(Numerology.SYSTEMS)) {
       const r = Numerology.calculate(id, text);
-      let line = r.terms.map(t => t.kind === "letter" ? t.char + t.value : t.char).join(" + ");
+      const used = new Set(r.terms.map(t => t.char));
+      for (const [letter, td] of Object.entries(cells[id])) td.classList.toggle("used", used.has(letter));
+
+      document.getElementById(`${id}-result`).hidden = !r.terms.length;
+      if (!r.terms.length) continue;
+      let line = r.terms.map(t => t.kind === "letter" ? `${t.char}<sub>${t.value}</sub>` : t.char).join(" + ");
       line += ` = ${r.raw}`;
       for (const s of r.steps) line += ` → ${s.digits.join("+")} = ${s.total}`;
-      document.getElementById(`${id}-working`).textContent = r.terms.length ? line : "No letters or digits.";
-      document.getElementById(`${id}-final`).textContent = r.terms.length ? r.reduced : "";
+      document.getElementById(`${id}-working`).innerHTML = line;
+      const label = id === "chaldean" ? "reduced / compound" : "reduced / raw";
+      document.getElementById(`${id}-final`).innerHTML = `${r.reduced} / ${r.raw}<small>${label}</small>`;
     }
   });
 </script>
